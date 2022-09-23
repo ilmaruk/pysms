@@ -12,9 +12,25 @@ jobs:
   build:
    runs-on: ubuntu-latest
    steps:
-     - uses: actions/checkout@v2
-     - uses: actions/setup-python@v2
+     - name: Checkout
+       uses: actions/checkout@v2
+     - name: Setup Python 3.x
+       uses: actions/setup-python@v2
        with:
          python-version: "3.x"
-     - run: pip install .
-     - run: pytest .
+     - name: Build
+       run: pip install .
+     - name: Test
+       run: pytest --cov .
+     - name: Coverage Report
+       uses: irongut/CodeCoverageSummary@v1.3.0
+       with:
+         filename: coverage/coverage.xml
+         badge: true
+         fail_below_min: true
+         format: markdown
+         hide_branch_rate: false
+         hide_complexity: true
+         indicators: true
+         output: both
+         thresholds: '60 80'
