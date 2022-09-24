@@ -22,6 +22,14 @@ nations = {
         "translit": "ru",
         "weight": LOW_PROBABILITY
     },
+    "bra": {
+        "locales": ["pt_BR"],
+        "weight": HIGH_PROBABILITY
+    },
+    "por": {
+        "locales": ["pt_PT"],
+        "weight": HIGH_PROBABILITY
+    },
     "fra": {
         "locales": ["fr_FR"],
         "weight": HIGH_PROBABILITY
