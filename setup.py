@@ -6,9 +6,11 @@ setup(
     version="0.0.0",
     packages=find_packages(),
     install_requires=[
+        "Faker==14.2.1",
         "pydantic==1.10.2",
         "pytest==7.1.3",
-        "pytest-cov==3.0.0"
+        "pytest-cov==3.0.0",
+        "transliterate==1.10.2"
     ],
     # extras_require={
     #     "'dev'": [
