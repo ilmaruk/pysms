@@ -1,6 +1,6 @@
 import typing
 
-from pysms.models import Player, Roster
+from pysms.models import Player, Roster, Team
 
 
 class Provider(typing.Protocol):
@@ -14,4 +14,7 @@ class Provider(typing.Protocol):
         pass
 
     def save_roster(self, roster: Roster) -> bool:
+        pass
+
+    def save_team(self, team: Team) -> bool:
         pass

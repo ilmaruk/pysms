@@ -4,7 +4,7 @@ import typing
 import pydantic
 
 from .persistence import Provider
-from pysms.models import Player, Roster
+from pysms.models import Player, Roster, Team
 import pysms.persistence.models as models
 
 PLAYERS_DIR = "players"
@@ -32,6 +32,7 @@ class FilesystemProvider(Provider):
         return models.roster.inflate_roster(data, self)
 
     def save_roster(self, roster: Roster) -> bool:
+        self.save_team(roster.team)
         for player in roster.players:
             self.save_player(player)
 
@@ -39,4 +40,10 @@ class FilesystemProvider(Provider):
         path = os.path.join(self._base_dir, ROSTERS_DIR, f"{record.id}.json")
         with open(path, "wt") as fh:
             fh.write(record.json(indent=2))
+        return True
+
+    def save_team(self, team: Team) -> bool:
+        path = os.path.join(self._base_dir, TEAMS_DIR, f"{team.id}.json")
+        with open(path, "wt") as fh:
+            fh.write(team.json(indent=2))
         return True
