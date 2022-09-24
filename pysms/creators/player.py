@@ -8,41 +8,49 @@ import transliterate
 from faker import Faker
 from pysms.models import Player
 
+LOW_PROBABILITY = 1
+MEDIUM_PROBABILITY = 2
+HIGH_PROBABILITY = 3
+
+MIN_AGE = 18
+MAX_AGE = 35
+
 # TODO: add country population as "weight"
 nations = {
     "bul": {
         "locales": ["bg_BG"],
-        "translit": "ru"
+        "translit": "ru",
+        "weight": LOW_PROBABILITY
     },
     "fra": {
         "locales": ["fr_FR"],
-        "weight": 65_273_511
+        "weight": HIGH_PROBABILITY
     },
     "spa": {
         "locales": ["es", "es_ES"],
-        "weight": 46_754_778
+        "weight": HIGH_PROBABILITY
     },
     "ita": {
         "locales": ["it_IT"],
-        "weight": 60_461_826
+        "weight": HIGH_PROBABILITY
     },
     "rus": {
         "locales": ["ru_RU"],
         "translit": "ru",
-        "weight": 145_934_462
+        "weight": MEDIUM_PROBABILITY
     },
     "swi": {
         "locales": ["it_CH", "fr_CH", "de_CH"],
-        "weight": 8_654_622
+        "weight": LOW_PROBABILITY
     },
     "ger": {
         "locales": ["de", "de_DE"],
-        "weight": 83_783_942
+        "weight": HIGH_PROBABILITY
     },
     "ukr": {
         "locales": ["uk_UA"],
         "translit": "ru",
-        "weight": 43_733_762
+        "weight": MEDIUM_PROBABILITY
     }
 }
 
@@ -87,10 +95,7 @@ def random_bio() -> typing.Tuple[str, str, datetime.datetime]:
     if translit_from:
         name = transliterate.translit(name, translit_from, reversed=True)
 
-    # DOB
-    age = random.randint(16, 35)
-    dob = (datetime.date.today() - datetime.timedelta(days=365*(age-1)) -
-           datetime.timedelta(days=random.randint(0, 366)))
+    dob = random_dob(MIN_AGE, MAX_AGE)
 
     return name, nation, dob
 
@@ -101,3 +106,9 @@ def random_nation() -> str:
     values = list(nations.keys())
     weights = [nation.get("weight", 1) for nation in nations.values()]
     return random.choices(values, weights=weights, k=1)[0]
+
+
+def random_dob(min_age: int, max_age: int) -> datetime.date:
+    age = random.randint(MIN_AGE, MAX_AGE)
+    return (datetime.date.today() - datetime.timedelta(days=365*(age-1)) -
+            datetime.timedelta(days=random.randint(0, 366)))
