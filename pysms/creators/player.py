@@ -18,7 +18,7 @@ nations = {
         "locales": ["fr_FR"]
     },
     "spa": {
-        "locales": ["es_ES"]
+        "locales": ["es", "es_ES"]
     },
     "ita": {
         "locales": ["it_IT"]
@@ -26,6 +26,12 @@ nations = {
     "rus": {
         "locales": ["ru_RU"],
         "translit": "ru"
+    },
+    "swi": {
+        "locales": ["it_CH", "fr_CH", "de_CH"]
+    },
+    "ger": {
+        "locales": ["de", "de_DE"]
     },
     "ukr": {
         "locales": ["uk_UA"],
@@ -40,7 +46,7 @@ def allowed_locales() -> typing.List[str]:
     """
     locales = set([])
     for nation in nations.values():
-        locales.add(*nation["locales"])
+        locales.update(nation["locales"])
     return list(locales)
 
 
@@ -76,8 +82,8 @@ def random_bio() -> typing.Tuple[str, str, datetime.datetime]:
 
     # DOB
     age = random.randint(16, 35)
-    dob = datetime.date.today() - datetime.timedelta(days=365*(age-1)) - \
-        datetime.timedelta(days=random.randint(0, 366))
+    dob = (datetime.date.today() - datetime.timedelta(days=365*(age-1)) -
+           datetime.timedelta(days=random.randint(0, 366)))
 
     return name, nation, dob
 
