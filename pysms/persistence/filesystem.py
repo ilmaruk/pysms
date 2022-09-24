@@ -4,7 +4,8 @@ import typing
 import pydantic
 
 from .persistence import Provider
-from pysms.models import Player
+from pysms.models import Player, Roster
+import pysms.persistence.models as models
 
 
 class FilesystemProvider(Provider):
@@ -17,4 +18,19 @@ class FilesystemProvider(Provider):
 
     def save_player(self, player: Player) -> bool:
         with open(f"{self._base_dir}/players/{player.id}.json", "wt") as fh:
-            fh.write(player.json())
+            fh.write(player.json(indent=2))
+        return True
+
+    def load_roster(self, roster_id: str) -> Roster:
+        data = pydantic.parse_file_as(
+            path=f"{self._base_dir}/rosters/{roster_id}.json", type_=models.Roster)
+        return models.roster.inflate_roster(data, self)
+
+    def save_roster(self, roster: Roster) -> bool:
+        for player in roster.players:
+            self.save_player(player)
+
+        record = models.roster.deflate_roster(roster)
+        with open(f"{self._base_dir}/rosters/{record.id}.json", "wt") as fh:
+            fh.write(record.json(indent=2))
+        return True
