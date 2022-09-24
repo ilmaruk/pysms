@@ -55,6 +55,20 @@ def show_roster(roster_id: str) -> None:
     print(roster.json(indent=2))
 
 
+@click.group(name="team")
+def team_group():
+    pass
+
+
+@click.command(name="create")
+def create_team() -> None:
+    print("pysms team create")
+    team = creators.create_team()
+    # provider = provider_factory()
+    # provider.save_roster(roster)
+    print(team.json(indent=2))
+
+
 player_group.add_command(create_player)
 player_group.add_command(show_player)
 pysms.add_command(player_group)
@@ -62,3 +76,6 @@ pysms.add_command(player_group)
 roster_group.add_command(create_roster)
 roster_group.add_command(show_roster)
 pysms.add_command(roster_group)
+
+team_group.add_command(create_team)
+pysms.add_command(team_group)
