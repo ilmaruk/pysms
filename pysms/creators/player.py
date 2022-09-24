@@ -8,12 +8,17 @@ import transliterate
 from faker import Faker
 from pysms.models import Player
 
-# Listing nations to guarantee a uniform distribution
-# TODO: distribution should adehere to countries' population
+# TODO: add country population as "weight"
 nations = {
     "bul": {
         "locales": ["bg_BG"],
         "translit": "ru"
+    },
+    "fra": {
+        "locales": ["fr_FR"]
+    },
+    "spa": {
+        "locales": ["es_ES"]
     },
     "ita": {
         "locales": ["it_IT"]
@@ -58,11 +63,11 @@ def create_player() -> Player:
 def random_bio() -> typing.Tuple[str, str, datetime.datetime]:
     """Selects a nationality and generates a random name.
     """
-    nation = random.choice(list(nations.keys()))
+    nation = random_nation()
     locale = random.choice(nations[nation]["locales"])
 
     # Not using name_male() to avoid titles.
-    name = fake[locale].first_name() + " " + fake[locale].last_name()
+    name = fake[locale].first_name_male() + " " + fake[locale].last_name_male()
 
     # Transliterates the name, if necessary
     translit_from = nations[nation].get("translit")
@@ -75,3 +80,11 @@ def random_bio() -> typing.Tuple[str, str, datetime.datetime]:
         datetime.timedelta(days=random.randint(0, 366))
 
     return name, nation, dob
+
+
+def random_nation() -> str:
+    """Selects a random nation, using weights, if available.
+    """
+    values = list(nations.keys())
+    weights = [nation.get("weight", 1) for nation in nations.values()]
+    return random.choices(values, weights=weights, k=1)[0]
