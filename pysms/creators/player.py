@@ -15,27 +15,34 @@ nations = {
         "translit": "ru"
     },
     "fra": {
-        "locales": ["fr_FR"]
+        "locales": ["fr_FR"],
+        "weight": 65_273_511
     },
     "spa": {
-        "locales": ["es", "es_ES"]
+        "locales": ["es", "es_ES"],
+        "weight": 46_754_778
     },
     "ita": {
-        "locales": ["it_IT"]
+        "locales": ["it_IT"],
+        "weight": 60_461_826
     },
     "rus": {
         "locales": ["ru_RU"],
-        "translit": "ru"
+        "translit": "ru",
+        "weight": 145_934_462
     },
     "swi": {
-        "locales": ["it_CH", "fr_CH", "de_CH"]
+        "locales": ["it_CH", "fr_CH", "de_CH"],
+        "weight": 8_654_622
     },
     "ger": {
-        "locales": ["de", "de_DE"]
+        "locales": ["de", "de_DE"],
+        "weight": 83_783_942
     },
     "ukr": {
         "locales": ["uk_UA"],
-        "translit": "ru"
+        "translit": "ru",
+        "weight": 43_733_762
     }
 }
 

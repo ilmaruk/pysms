@@ -6,6 +6,7 @@ setup(
     version="0.0.0",
     packages=find_packages(),
     install_requires=[
+        "click==8.1.3",
         "Faker==14.2.1",
         "pydantic==1.10.2",
         "pytest==7.1.3",
@@ -23,6 +24,5 @@ setup(
     entry_points="""
     [console_scripts]
     pysms=pysms.pysms:pysms
-    tsc=pysms.pysms:tsc
     """
 )
