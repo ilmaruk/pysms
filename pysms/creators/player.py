@@ -2,20 +2,27 @@ import datetime
 import random
 import typing
 import uuid
+from pysms.models.player import PlayerPosition, PlayerSide
 
 import transliterate
-
 from faker import Faker
+
+from pysms.utils import rand
 from pysms.models import Player
 
 LOW_PROBABILITY = 1
 MEDIUM_PROBABILITY = 2
 HIGH_PROBABILITY = 3
 
-MIN_AGE = 18
-MAX_AGE = 35
+MIN_AGE = 16
+MAX_AGE = 30
 
-# TODO: add country population as "weight"
+AVG_MAIN_SKILL = 14
+AVG_MEDIUM_SKILL = 11
+AVG_SECONDARY_SKILL = 7
+AVG_STAMINA = 60
+AVG_AGGRESSION = 30
+
 nations = {
     "bul": {
         "locales": ["bg_BG"],
@@ -76,15 +83,24 @@ def allowed_locales() -> typing.List[str]:
 fake = Faker(allowed_locales())
 
 
-def create_player() -> Player:
+def create_player(position: PlayerPosition) -> Player:
     """Create a new player.
     """
     name, nationality, dob = random_bio()
+    st, tk, ps, sh = random_skills(position, AVG_MAIN_SKILL, AVG_MEDIUM_SKILL, AVG_SECONDARY_SKILL)
     args = {
         "id": uuid.uuid4(),
         "name": name,
         "nationality": nationality,
-        "dob": dob
+        "dob": dob,
+        "position": position,
+        "side": random_side(),
+        "stopping": st,
+        "tackling": tk,
+        "passing": ps,
+        "shooting": sh,
+        "stamina": round(rand.bounded_gauss(AVG_STAMINA, AVG_STAMINA/2)),
+        "aggression": round(rand.bounded_gauss(AVG_AGGRESSION, AVG_AGGRESSION/3)),
     }
     return Player(**args)
 
@@ -117,6 +133,69 @@ def random_nation() -> str:
 
 
 def random_dob(min_age: int, max_age: int) -> datetime.date:
-    age = random.randint(MIN_AGE, MAX_AGE)
+    mu = (MIN_AGE + MAX_AGE) / 2
+    sigma = (MAX_AGE + MIN_AGE) / 2
+    age = round(rand.bounded_gauss(mu, sigma))
     return (datetime.date.today() - datetime.timedelta(days=365*(age-1)) -
             datetime.timedelta(days=random.randint(0, 366)))
+
+
+def random_side() -> PlayerSide:
+    sides: typing.List[PlayerSide] = [
+        PlayerSide.RIGHT, PlayerSide.LEFT, PlayerSide.CENTRE,
+        PlayerSide.RIGHT_CENTRE, PlayerSide.RIGHT_LEFT, PlayerSide.LEFT_CENTRE,
+        PlayerSide.ANY
+    ]
+    weights = [40, 30, 48, 10, 10, 5, 9]
+    return random.choices(sides, weights, k=1)[0]
+
+
+def random_skills(position: PlayerPosition, main_skill: int, medium_skill: int, secondary_skill: int) -> typing.Tuple[int, int, int, int]:
+    low_skill = secondary_skill / 2
+    values = {
+        PlayerPosition.GOALKEEPER: {
+            "st": (main_skill, 3),
+            "tk": (low_skill, 2),
+            "ps": (low_skill, 2),
+            "sh": (low_skill, 2),
+        },
+        PlayerPosition.DEFENDER: {
+            "st": (low_skill, 2),
+            "tk": (main_skill, 3),
+            "ps": (secondary_skill, 2),
+            "sh": (secondary_skill, 2),
+        },
+        PlayerPosition.DEFENDING_MIDFIELDER: {
+            "st": (low_skill, 2),
+            "tk": (medium_skill, 3),
+            "ps": (medium_skill, 3),
+            "sh": (secondary_skill, 2),
+        },
+        PlayerPosition.MIDFIELDER: {
+            "st": (low_skill, 2),
+            "tk": (secondary_skill, 2),
+            "ps": (main_skill, 3),
+            "sh": (secondary_skill, 2),
+        },
+        PlayerPosition.ATTACKING_MIDFIELDER: {
+            "st": (low_skill, 2),
+            "tk": (secondary_skill, 2),
+            "ps": (medium_skill, 3),
+            "sh": (medium_skill, 3),
+        },
+        PlayerPosition.FORWARD: {
+            "st": (low_skill, 2),
+            "tk": (secondary_skill, 2),
+            "ps": (secondary_skill, 2),
+            "sh": (main_skill, 3),
+        },
+    }
+
+    def random_skill(skill: int, factor: int) -> int:
+        return round(rand.bounded_gauss(skill, skill / factor))
+
+    st = random_skill(*values[position]["st"])
+    tk = random_skill(*values[position]["tk"])
+    ps = random_skill(*values[position]["ps"])
+    sh = random_skill(*values[position]["sh"])
+    return st, tk, ps, sh

@@ -15,11 +15,14 @@ def player_group():
 
 
 @click.command(name="create")
-def create_player() -> None:
+@click.option("--position", "-p", required=True, help="The player position")
+@click.option("--save", "-s", is_flag=True, show_default=True, default=False)
+def create_player(position: str, save: bool) -> None:
     print("pysms player create")
-    player = creators.create_player()
-    provider = provider_factory()
-    provider.save_player(player)
+    player = creators.create_player(position)
+    if save:
+        provider = provider_factory()
+        provider.save_player(player)
     print(player.json(indent=2))
 
 
@@ -38,11 +41,13 @@ def roster_group():
 
 
 @click.command(name="create")
-def create_roster() -> None:
+@click.option("--save", "-s", is_flag=True, show_default=True, default=False)
+def create_roster(save) -> None:
     print("pysms roster create")
     roster = creators.create_roster()
-    provider = provider_factory()
-    provider.save_roster(roster)
+    if save:
+        provider = provider_factory()
+        provider.save_roster(roster)
     print(roster.json(indent=2))
 
 
