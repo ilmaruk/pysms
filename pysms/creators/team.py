@@ -16,7 +16,7 @@ VERY_HIGH_PROBABILITY = 5
 
 def create_team() -> Team:
     name, short = random_name()
-    return Team(id=uuid.uuid4(), name=name, short=short)
+    return Team(id=uuid.uuid4(), name=name, short=short, colors=random_colors())
 
 
 def random_name() -> typing.Tuple[str, str]:
@@ -47,3 +47,31 @@ def shorten_team_name(name: str) -> str:
             if len(short) == SHORT_LEN:
                 return short
     return short + "x" * (SHORT_LEN - len(short))
+
+
+def random_colors() -> typing.List[str]:
+    options = {
+        ('black', 'blue'): 3,
+        ('blue',): 4,
+        ('blue', 'white'): 1,
+        ('green', 'black'): 1,
+        ('grey', 'red'): 1,
+        ('lightblue',): 1,
+        ('maroon',): 4,
+        ('orange', 'green'): 1,
+        ('pink', 'black'): 1,
+        ('purple',): 1,
+        ('red', 'black'): 1,
+        ('red', 'darkblue'): 4,
+        ('red', 'green'): 1,
+        ('red', 'white'): 2,
+        ('white', 'black'): 4,
+        ('white', 'red'): 2,
+        ('yellow', 'blue'): 4,
+        ('yellow', 'red'): 3,
+        ('white', 'lightblue'): 1,
+        }
+    cols = random.choices(population=list(options.keys()), weights=options.values(), k=1)[0]
+    if len(cols) > 1 and random.choice([True, False]):
+        # Flip colors
+        cols = (cols[1], cols[0])
