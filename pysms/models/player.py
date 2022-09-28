@@ -24,6 +24,27 @@ class PlayerSide(str, Enum):
     CENTRE = "C"
 
 
+class PlayerAbilities(pydantic.BaseModel):
+    stopping: int = 300
+    tackling: int = 300
+    passing: int = 300
+    shooting: int = 300
+
+
+class PlayerStats(pydantic.BaseModel):
+    games: int = 0
+    saves: int = 0
+    tackles: int = 0
+    keypasses: int = 0
+    shots: int = 0
+    goals: int = 0
+    assists: int = 0
+    dp: int = 0
+    injury: int = 0
+    suspension: int = 0
+    fitness: int = 100
+
+
 class Player(pydantic.BaseModel):
     id: uuid.UUID
     name: str
@@ -37,3 +58,5 @@ class Player(pydantic.BaseModel):
     shooting: int
     stamina: int
     aggression: int
+    abilities: PlayerAbilities = PlayerAbilities()
+    stats: PlayerStats = PlayerStats()
