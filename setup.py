@@ -9,6 +9,7 @@ setup(
         "click==8.1.3",
         "Faker==14.2.1",
         "pydantic==1.10.2",
+        "python_dotenv==0.21.0",
         "pytest==7.1.3",
         "pytest-cov==3.0.0",
         "transliterate==1.10.2"

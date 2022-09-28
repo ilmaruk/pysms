@@ -2,7 +2,7 @@ import typing
 import uuid
 
 from pysms.models import Roster, Team, Player, PlayerPosition
-from .player import create_player
+from .player import create_player, PlayerCreateConfig
 from .team import create_team
 
 ROSTER_COMPOSITION = {
@@ -15,12 +15,12 @@ ROSTER_COMPOSITION = {
 }
 
 
-def create_roster(team: typing.Optional[Team] = None) -> Roster:
+def create_roster(config: PlayerCreateConfig, team: typing.Optional[Team] = None) -> Roster:
     if not team:
         team = create_team()
 
     players: typing.List[Player] = []
     for position, count in ROSTER_COMPOSITION.items():
         for _ in range(count):
-            players.append(create_player(position))
+            players.append(create_player(config, position))
     return Roster(id=uuid.uuid4(), team=team, players=players)

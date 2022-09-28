@@ -4,6 +4,7 @@ import typing
 import uuid
 from pysms.models.player import PlayerPosition, PlayerSide
 
+import pydantic
 import transliterate
 from faker import Faker
 
@@ -14,14 +15,19 @@ LOW_PROBABILITY = 1
 MEDIUM_PROBABILITY = 2
 HIGH_PROBABILITY = 3
 
-MIN_AGE = 16
-MAX_AGE = 30
 
-AVG_MAIN_SKILL = 14
-AVG_MEDIUM_SKILL = 11
-AVG_SECONDARY_SKILL = 7
-AVG_STAMINA = 60
-AVG_AGGRESSION = 30
+class PlayerCreateConfig(pydantic.BaseSettings):
+    MIN_AGE: int = 16
+    MAX_AGE: int = 30
+    AVG_MAIN_SKILL: int = 14
+    AVG_MEDIUM_SKILL: int = 11
+    AVG_SECONDARY_SKILL: int = 7
+    AVG_STAMINA: int = 60
+    AVG_AGGRESSION: int = 30
+
+    class Config:
+        env_prefix: str = "PYSMS_"
+
 
 nations = {
     "bul": {
@@ -83,11 +89,12 @@ def allowed_locales() -> typing.List[str]:
 fake = Faker(allowed_locales())
 
 
-def create_player(position: PlayerPosition) -> Player:
+def create_player(config: PlayerCreateConfig, position: PlayerPosition) -> Player:
     """Create a new player.
     """
-    name, nationality, dob = random_bio()
-    st, tk, ps, sh = random_skills(position, AVG_MAIN_SKILL, AVG_MEDIUM_SKILL, AVG_SECONDARY_SKILL)
+    name, nationality, dob = random_bio(config.MIN_AGE, config.MIN_AGE)
+    st, tk, ps, sh = random_skills(
+        position, config.AVG_MAIN_SKILL, config.AVG_MEDIUM_SKILL, config.AVG_SECONDARY_SKILL)
     args = {
         "id": uuid.uuid4(),
         "name": name,
@@ -99,13 +106,13 @@ def create_player(position: PlayerPosition) -> Player:
         "tackling": tk,
         "passing": ps,
         "shooting": sh,
-        "stamina": round(rand.bounded_gauss(AVG_STAMINA, AVG_STAMINA/2)),
-        "aggression": round(rand.bounded_gauss(AVG_AGGRESSION, AVG_AGGRESSION/3)),
+        "stamina": round(rand.bounded_gauss(config.AVG_STAMINA, config.AVG_STAMINA/2)),
+        "aggression": round(rand.bounded_gauss(config.AVG_AGGRESSION, config.AVG_AGGRESSION/3)),
     }
     return Player(**args)
 
 
-def random_bio() -> typing.Tuple[str, str, datetime.datetime]:
+def random_bio(min_age: int, max_age: int) -> typing.Tuple[str, str, datetime.datetime]:
     """Selects a nationality and generates a random name.
     """
     nation = random_nation()
@@ -119,7 +126,7 @@ def random_bio() -> typing.Tuple[str, str, datetime.datetime]:
     if translit_from:
         name = transliterate.translit(name, translit_from, reversed=True)
 
-    dob = random_dob(MIN_AGE, MAX_AGE)
+    dob = random_dob(min_age, max_age)
 
     return name, nation, dob
 
@@ -133,8 +140,8 @@ def random_nation() -> str:
 
 
 def random_dob(min_age: int, max_age: int) -> datetime.date:
-    mu = (MIN_AGE + MAX_AGE) / 2
-    sigma = (MAX_AGE + MIN_AGE) / 2
+    mu = (min_age + max_age) / 2
+    sigma = (min_age + max_age) / 2
     age = round(rand.bounded_gauss(mu, sigma))
     return (datetime.date.today() - datetime.timedelta(days=365*(age-1)) -
             datetime.timedelta(days=random.randint(0, 366)))

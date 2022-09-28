@@ -15,11 +15,14 @@ def player_group():
 
 
 @click.command(name="create")
+@click.option("--env", "-e", help="The file where to get env variables from")
 @click.option("--position", "-p", required=True, help="The player position")
 @click.option("--save", "-s", is_flag=True, show_default=True, default=False)
-def create_player(position: str, save: bool) -> None:
+def create_player(env: str, position: str, save: bool) -> None:
     print("pysms player create")
-    player = creators.create_player(position)
+    config = creators.PlayerCreateConfig(_env_file=env)
+    print(config)
+    player = creators.create_player(config, position)
     if save:
         provider = provider_factory()
         provider.save_player(player)
@@ -44,7 +47,8 @@ def roster_group():
 @click.option("--save", "-s", is_flag=True, show_default=True, default=False)
 def create_roster(save) -> None:
     print("pysms roster create")
-    roster = creators.create_roster()
+    config = creators.PlayerCreateConfig()
+    roster = creators.create_roster(config)
     if save:
         provider = provider_factory()
         provider.save_roster(roster)
