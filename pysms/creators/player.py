@@ -26,7 +26,7 @@ class PlayerCreateConfig(pydantic.BaseSettings):
     AVG_AGGRESSION: int = 30
 
     class Config:
-        env_prefix: str = "PYSMS_"
+        env_prefix: str = "PYSMS_PLAYER_"
 
 
 nations = {

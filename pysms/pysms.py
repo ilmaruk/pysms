@@ -44,10 +44,12 @@ def roster_group():
 
 
 @click.command(name="create")
+@click.option("--env", "-e", help="The file where to get env variables from")
 @click.option("--save", "-s", is_flag=True, show_default=True, default=False)
-def create_roster(save) -> None:
+def create_roster(env: str, save: bool) -> None:
     print("pysms roster create")
-    config = creators.PlayerCreateConfig()
+    players_config = creators.PlayerCreateConfig(_env_file=env)
+    config = creators.RosterCreateConfig(players=players_config, _env_file=env)
     roster = creators.create_roster(config)
     if save:
         provider = provider_factory()
