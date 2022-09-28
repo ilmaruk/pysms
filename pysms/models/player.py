@@ -1,4 +1,5 @@
 import datetime
+import typing
 import uuid
 from enum import Enum
 
@@ -46,12 +47,12 @@ class PlayerStats(pydantic.BaseModel):
 
 
 class Player(pydantic.BaseModel):
-    id: uuid.UUID
+    id: typing.Optional[uuid.UUID]
     name: str
-    nationality: str
-    dob: datetime.date
-    position: PlayerPosition
-    side: PlayerSide
+    nationality: typing.Optional[str]
+    dob: typing.Optional[datetime.date]
+    position: typing.Optional[PlayerPosition]
+    side: typing.Optional[PlayerSide]
     stopping: int
     tackling: int
     passing: int
@@ -68,3 +69,33 @@ class Player(pydantic.BaseModel):
     # TODO: remove
     def __repr__(self):
         return f"{self.name},{self.position},{self.stopping},{self.tackling},{self.passing},{self.shooting}"
+
+
+def player_contribution(player: Player, position: PlayerPosition) -> int:
+    """Calculate the contribution of a player in a specific position.
+    """
+    WEIGHT_HIGH = 3
+    WEIGHT_MEDIUM = 2
+    WEIGHT_LOW = 1
+    weights = {
+        PlayerPosition.GOALKEEPER: (WEIGHT_HIGH, WEIGHT_LOW, WEIGHT_LOW, WEIGHT_LOW),
+        PlayerPosition.DEFENDER: (WEIGHT_LOW, WEIGHT_HIGH, WEIGHT_MEDIUM, WEIGHT_LOW),
+        PlayerPosition.MIDFIELDER: (WEIGHT_LOW, WEIGHT_MEDIUM, WEIGHT_HIGH, WEIGHT_MEDIUM),
+        PlayerPosition.FORWARD: (WEIGHT_LOW, WEIGHT_LOW, WEIGHT_MEDIUM, WEIGHT_HIGH),
+    }
+    st_w, tk_w, ps_w, sh_w = weights.get(
+        position, (WEIGHT_LOW, WEIGHT_LOW, WEIGHT_LOW, WEIGHT_LOW))
+    return (player.stopping * st_w + player.tackling * tk_w + player.passing * ps_w + player.shooting * sh_w) * player.stats.fitness
+
+
+def player_max_contribution(player: Player) -> typing.Tuple[PlayerPosition, int]:
+    """Determine which position a player gives their max contribution in.
+    """
+    max_position: PlayerPosition
+    max_contribution = -1
+    for position in [PlayerPosition.GOALKEEPER, PlayerPosition.DEFENDER, PlayerPosition.MIDFIELDER, PlayerPosition.FORWARD]:
+        contrib = player_contribution(player, position)
+        if max_contribution < contrib:
+            max_contribution = contrib
+            max_position = position
+    return max_position, max_contribution

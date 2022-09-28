@@ -19,6 +19,6 @@ ALLOWED_FORMATIONS: typing.List[Formation] = [
 
 class Teamsheet(pydantic.BaseModel):
     team: Team
-    formation: Formation
+    formation: typing.Optional[Formation]
     field: typing.List[Player]
     bench: typing.List[Player]

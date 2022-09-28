@@ -1,7 +1,9 @@
 import click
 
-from pysms.persistence import provider_factory
 from pysms import creators
+from pysms.persistence import provider_factory
+
+from pysms.models import PlayerPosition
 
 
 @click.group()
@@ -91,7 +93,8 @@ def create_teamsheet(env: str) -> None:
     print("pysms teamsheet create")
     # FIXME: for now, let's create a brand new roster
     players_config = creators.PlayerCreateConfig(_env_file=env)
-    roster_config = creators.RosterCreateConfig(players=players_config, _env_file=env)
+    roster_config = creators.RosterCreateConfig(
+        players=players_config, _env_file=env)
     roster = creators.create_roster(roster_config)
 
     teamsheet = creators.create_teamsheet(roster)
