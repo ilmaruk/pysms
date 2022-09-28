@@ -71,7 +71,8 @@ def random_colors() -> typing.List[str]:
         ('yellow', 'red'): 3,
         ('white', 'lightblue'): 1,
         }
-    cols = random.choices(population=list(options.keys()), weights=options.values(), k=1)[0]
-    if len(cols) > 1 and random.choice([True, False]):
+    colors = random.choices(population=list(options.keys()), weights=options.values(), k=1)[0]
+    if len(colors) > 1 and random.choice([True, False]):
         # Flip colors
-        cols = (cols[1], cols[0])
+        return (colors[1], colors[0])
+    return colors

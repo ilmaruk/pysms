@@ -60,3 +60,11 @@ class Player(pydantic.BaseModel):
     aggression: int
     abilities: PlayerAbilities = PlayerAbilities()
     stats: PlayerStats = PlayerStats()
+
+    # TODO: remove
+    def __str__(self):
+        return f"{self.name},{self.position},{self.stopping},{self.tackling},{self.passing},{self.shooting}"
+
+    # TODO: remove
+    def __repr__(self):
+        return f"{self.name},{self.position},{self.stopping},{self.tackling},{self.passing},{self.shooting}"

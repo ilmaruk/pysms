@@ -80,6 +80,24 @@ def create_team() -> None:
     print(team.json(indent=2))
 
 
+@click.group(name="teamsheet")
+def teamsheet_group():
+    pass
+
+
+@click.command(name="create")
+@click.option("--env", "-e", help="The file where to get env variables from")
+def create_teamsheet(env: str) -> None:
+    print("pysms teamsheet create")
+    # FIXME: for now, let's create a brand new roster
+    players_config = creators.PlayerCreateConfig(_env_file=env)
+    roster_config = creators.RosterCreateConfig(players=players_config, _env_file=env)
+    roster = creators.create_roster(roster_config)
+
+    teamsheet = creators.create_teamsheet(roster)
+    print(teamsheet.json(indent=2))
+
+
 player_group.add_command(create_player)
 player_group.add_command(show_player)
 pysms.add_command(player_group)
@@ -90,3 +108,6 @@ pysms.add_command(roster_group)
 
 team_group.add_command(create_team)
 pysms.add_command(team_group)
+
+teamsheet_group.add_command(create_teamsheet)
+pysms.add_command(teamsheet_group)
