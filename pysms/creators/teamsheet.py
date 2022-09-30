@@ -16,7 +16,4 @@ def create_teamsheet(roster: Roster) -> Teamsheet:
                        key=lambda p: player_max_contribution(p)[1], reverse=True)
     field_players = [goalkeepers[0]] + outfields[:10]
     bench_players = [goalkeepers[1]] + outfields[10:9+MAX_SUBS]
-    # Temporary
-    positions = [player_max_contribution(p)[0] for p in field_players]
-    print(positions)
     return Teamsheet(team=roster.team, field=field_players, bench=bench_players)
