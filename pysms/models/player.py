@@ -70,21 +70,23 @@ class Player(pydantic.BaseModel):
     def __repr__(self):
         return f"{self.name},{self.position},{self.stopping},{self.tackling},{self.passing},{self.shooting}"
 
+CONTRIBUTION_WEIGHT_HIGH = 3
+CONTRIBUTION_WEIGHT_MEDIUM = 2
+CONTRIBUTION_WEIGHT_LOW = 1
+CONTRIBUTION_WEIGHTS = {
+    PlayerPosition.GOALKEEPER: (CONTRIBUTION_WEIGHT_HIGH, CONTRIBUTION_WEIGHT_MEDIUM, CONTRIBUTION_WEIGHT_LOW, CONTRIBUTION_WEIGHT_LOW),
+    PlayerPosition.DEFENDER: (CONTRIBUTION_WEIGHT_LOW, CONTRIBUTION_WEIGHT_HIGH, CONTRIBUTION_WEIGHT_MEDIUM, CONTRIBUTION_WEIGHT_LOW),
+    PlayerPosition.DEFENDING_MIDFIELDER: (CONTRIBUTION_WEIGHT_LOW, CONTRIBUTION_WEIGHT_MEDIUM, CONTRIBUTION_WEIGHT_HIGH, CONTRIBUTION_WEIGHT_LOW),
+    PlayerPosition.ATTACKING_MIDFIELDER: (CONTRIBUTION_WEIGHT_LOW, CONTRIBUTION_WEIGHT_LOW, CONTRIBUTION_WEIGHT_HIGH, CONTRIBUTION_WEIGHT_MEDIUM),
+    PlayerPosition.FORWARD: (CONTRIBUTION_WEIGHT_LOW, CONTRIBUTION_WEIGHT_LOW, CONTRIBUTION_WEIGHT_MEDIUM, CONTRIBUTION_WEIGHT_HIGH),
+}
+
 
 def player_contribution(player: Player, position: PlayerPosition) -> int:
     """Calculate the contribution of a player in a specific position.
     """
-    WEIGHT_HIGH = 3
-    WEIGHT_MEDIUM = 2
-    WEIGHT_LOW = 1
-    weights = {
-        PlayerPosition.GOALKEEPER: (WEIGHT_HIGH, WEIGHT_LOW, WEIGHT_LOW, WEIGHT_LOW),
-        PlayerPosition.DEFENDER: (WEIGHT_LOW, WEIGHT_HIGH, WEIGHT_MEDIUM, WEIGHT_LOW),
-        PlayerPosition.MIDFIELDER: (WEIGHT_LOW, WEIGHT_MEDIUM, WEIGHT_HIGH, WEIGHT_MEDIUM),
-        PlayerPosition.FORWARD: (WEIGHT_LOW, WEIGHT_LOW, WEIGHT_MEDIUM, WEIGHT_HIGH),
-    }
-    st_w, tk_w, ps_w, sh_w = weights.get(
-        position, (WEIGHT_LOW, WEIGHT_LOW, WEIGHT_LOW, WEIGHT_LOW))
+    st_w, tk_w, ps_w, sh_w = CONTRIBUTION_WEIGHTS.get(
+        position, (CONTRIBUTION_WEIGHT_LOW, CONTRIBUTION_WEIGHT_LOW, CONTRIBUTION_WEIGHT_LOW, CONTRIBUTION_WEIGHT_LOW))
     return (player.stopping * st_w + player.tackling * tk_w + player.passing * ps_w + player.shooting * sh_w) * player.stats.fitness
 
 
@@ -93,7 +95,7 @@ def player_max_contribution(player: Player) -> typing.Tuple[PlayerPosition, int]
     """
     max_position: PlayerPosition
     max_contribution = -1
-    for position in [PlayerPosition.GOALKEEPER, PlayerPosition.DEFENDER, PlayerPosition.MIDFIELDER, PlayerPosition.FORWARD]:
+    for position in CONTRIBUTION_WEIGHTS.keys():
         contrib = player_contribution(player, position)
         if max_contribution < contrib:
             max_contribution = contrib

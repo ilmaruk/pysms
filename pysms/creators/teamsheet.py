@@ -13,7 +13,10 @@ def create_teamsheet(roster: Roster) -> Teamsheet:
     goalkeepers = sorted([p for p in available if p.position == PlayerPosition.GOALKEEPER],
                          key=lambda p: player_contribution(p, PlayerPosition.GOALKEEPER), reverse=True)
     outfields = sorted([p for p in available if p.position != PlayerPosition.GOALKEEPER],
-                       key=lambda p: player_max_contribution(p), reverse=True)
+                       key=lambda p: player_max_contribution(p)[1], reverse=True)
     field_players = [goalkeepers[0]] + outfields[:10]
     bench_players = [goalkeepers[1]] + outfields[10:9+MAX_SUBS]
+    # Temporary
+    positions = [player_max_contribution(p)[0] for p in field_players]
+    print(positions)
     return Teamsheet(team=roster.team, field=field_players, bench=bench_players)

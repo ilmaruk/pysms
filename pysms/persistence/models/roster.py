@@ -21,7 +21,8 @@ def inflate_roster(src: Roster, provider: Provider) -> models.Roster:
     team = models.Team(
         id=src.team,
         name="Genoa CFC 1893",
-        short="gen"
+        short="gen",
+        colors=["red", "darkblue"]
     )
     players: typing.List[models.Player] = []
     for player_id in src.players:
